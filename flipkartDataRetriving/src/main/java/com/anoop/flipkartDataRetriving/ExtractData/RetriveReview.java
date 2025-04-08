@@ -89,7 +89,6 @@ public class RetriveReview {
                                                 String city = location.getString("city");
                                                 String state = location.getString("state");
                                                 System.out.println("city is : " + city + " and state : "+ state);
-                                                System.out.println("Anoop kumar");
                                             }
                                         }
 
