@@ -8,26 +8,35 @@ import org.springframework.stereotype.Service;
 import com.anoop.flipkartDataRetriving.ExtractData.RetriveImageLink;
 import com.anoop.flipkartDataRetriving.Model.CreateProduct;
 import com.anoop.flipkartDataRetriving.Model.ProductDetails;
+import com.anoop.flipkartDataRetriving.Repository.ProductDetailRepo;
+
+
+
 
 @Service
 public class CreateProductService {
 
+   
+   
+
     private GetDataFlipkart getDataFlipkart;
     private RetriveImageLink retriveImageLink;
-    private ImageDownloadService imageDownloadService;
-    private LinkEdit linkEdit;
+    private ProductDetailRepo productDetailRepo;
 
-    public CreateProductService(GetDataFlipkart getDataFlipkart, RetriveImageLink retriveImageLink, ImageDownloadService imageDownloadService, LinkEdit linkEdit) {
+   
+    public CreateProductService(GetDataFlipkart getDataFlipkart, RetriveImageLink retriveImageLink, ProductDetailRepo productDetailRepo) {
         this.getDataFlipkart = getDataFlipkart;
         this.retriveImageLink = retriveImageLink;
-        this.imageDownloadService = imageDownloadService;
-        this.linkEdit = linkEdit;
+        this.productDetailRepo = productDetailRepo;
+      
+        
+    
 
     }
 
-    public Boolean createProductUrl(CreateProduct createProduct) {
+  
+    public Boolean createProductUrl(CreateProduct createProduct) throws IOException {
         String url = createProduct.getProductURL();
-        linkEdit.reviewLinkEdit(url);
         int originalUrlIndx = url.indexOf("FLIPKART");
         String originalUrl = url.substring(24, originalUrlIndx + 8);
         if (createProduct != null) {
@@ -40,38 +49,26 @@ public class CreateProductService {
             String startWord = "multimediaComponents\":";
             String endWord = ",\"offerButton\":null,\"productDetailsAnnouncement";
             String findKeyValue = "url";
+
+            String firstWord = "</span><span class=\"VU-ZEz\">";
+            String lastWord = "</span></h1>";
            
-            List<String> productImgUrl = retriveImageLink.findData(startWord, endWord, filePath, findKeyValue);
+           
+            List<String> productImgUrl = retriveImageLink.findImageLink(startWord, endWord, filePath, findKeyValue);
+           String title = retriveImageLink.findProductTitle(firstWord, lastWord, filePath);
+           String price = retriveImageLink.findProductPrice("<div class=\"Nx9bqj CxhGGd\">", "</div>", filePath);
+           retriveImageLink.findProudctColorWithImage("{\"type\":\"ProductSwatchValue\",\"attributeOptions\":[", "],\"attributes\":[{\"attributeImage\":", filePath);
             
            
             ProductDetails productDetails = new ProductDetails();
             productDetails.setProductImageURL(productImgUrl);
-
-           retriveImageLink.deleteFile(filePath);
-
-
-        for (String productImgUrl2 : productImgUrl) {
-           
-           if (productImgUrl2.contains("{@width}")) {
+            productDetails.setTitle(title);
+            productDetails.setPrice(price);
+            productDetailRepo.save(productDetails); // save product details like image link, price, title
             
-           String width = productImgUrl2.replace("{@width}", "900");
-           String height = width.replace("{@height}","700");
-           String quality = height.replace("{@quality}", "100");
-            System.out.println(quality);
-            try {
-                imageDownloadService.downloadImage(quality, "D:\\E-Anuj\\flipkart\\image" + (int)(Math.random() * 10000) + ".jpg" );
-                
-            } catch (IOException e) {
-                
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                
-                e.printStackTrace();
-            }
-            
-           }
-        }
-            // System.out.println(productDetails);
+
+          retriveImageLink.deleteFile(filePath);
+
 
         }
         return true;

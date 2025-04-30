@@ -1,5 +1,6 @@
 package com.anoop.flipkartDataRetriving.RestComtroller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,13 @@ public class CreateProductRestCont {
 
     @PostMapping
     public Boolean createProductByUrl(@Valid @RequestBody CreateProduct createProduct) {
-        return createProductService.createProductUrl(createProduct);
+        try {
+            return createProductService.createProductUrl(createProduct);
+        } catch (IOException e) {
+      
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @PostMapping("review")

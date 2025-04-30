@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RetriveImageLink {
-    
 
     public void createFileAndWrite(String content) {
         try (FileWriter writer = new FileWriter("output.txt")) {
@@ -27,10 +26,10 @@ public class RetriveImageLink {
         }
     }
 
-    public List<String> findData(String startWord, String endWord, String filePath, String findKeyValue) {
+    // find the image link
+    public List<String> findImageLink(String startWord, String endWord, String filePath, String findKeyValue) {
 
         List<String> imgUrl = new ArrayList<>();
-
 
         try {
             // Read entire file into a single String
@@ -59,7 +58,7 @@ public class RetriveImageLink {
                                 JSONObject value = jsonObject.getJSONObject("value");
                                 if (value.has("url")) {
                                     String url = value.getString("url"); // Get the URL dynamically
-                                 //   System.out.println("Found URL at Index " + i + ": " + url);
+                                    // System.out.println("Found URL at Index " + i + ": " + url);
                                     imgUrl.add(url);
                                 }
                             }
@@ -77,7 +76,80 @@ public class RetriveImageLink {
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
         }
-                return null;
+        return null;
+    }
+
+    // find the product title
+    public String findProductTitle(String startWord, String endWord, String filePath) throws IOException {
+        String content = new String(Files.readAllBytes(Path.of(filePath)));
+        int startIdx = content.indexOf(startWord);
+        int endIdx = content.indexOf(endWord, startIdx);
+        int lenOfStartWord = startWord.length();
+        if (startIdx != -1 && endIdx != -1) {
+            String title = content.substring(startIdx + lenOfStartWord, endIdx);
+            System.out.println("Title is : " + title);
+            return title;
+        } else {
+            System.out.println("Con't find title");
+        }
+
+        return null;
+    }
+
+    // find the price of product
+    public String findProductPrice(String startWord, String endWord, String filePath) throws IOException {
+        String content = new String(Files.readAllBytes(Path.of(filePath)));
+        int startIdx = content.indexOf(startWord);
+        int endIdx = content.indexOf(endWord, startIdx);
+        int lenOfStartWord = startWord.length();
+        if (startIdx != -1 && endIdx != -1) {
+            String price = content.substring(startIdx + lenOfStartWord, endIdx);
+            System.out.println(" this price of product : " + price);
+            return price;
+        } else {
+            System.out.println("Con't find price");
+        }
+
+        return null;
+    }
+
+    // find the product color available with image
+    public void findProudctColorWithImage(String startWord, String endWord, String filePath) {
+        try {
+            String content = new String(Files.readAllBytes(Path.of(filePath)));
+            int startIdx = content.indexOf(startWord);
+            int endIdx = content.indexOf(endWord, startIdx);
+            int lenOfStartWord = startWord.length();
+            if (startIdx != -1 && endIdx != -1) {
+                String extractedContent = content.substring(
+                        startIdx + lenOfStartWord, endIdx);
+                String jsonString = extractedContent.trim();
+               // System.out.println("Extracted Content:\n" + jsonString + "\n\n\n\n");
+
+                JSONArray jsonArray = new JSONArray(jsonString);
+
+                for(int i = 0; i < jsonArray.length(); i++){
+                    Object object = jsonArray.get(i);
+                    
+                    if (object instanceof JSONObject jsonObject) {
+                      
+                        if (jsonObject.has("imageUrl")) {
+                            String imageUrl = jsonObject.getString("imageUrl");
+                            String productColor = jsonObject.getString("value");
+                            String productColorImg = imageUrl.replace("rukmini1", "rukminim2");
+                            System.out.println("Product Color is : "+ productColor + " Product color Image is : " + productColorImg);
+                            
+                        }
+                    }
+                }
+
+
+            }
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+
     }
 
     public void findTargetWordInFile(String targetWord, String filePath) {
