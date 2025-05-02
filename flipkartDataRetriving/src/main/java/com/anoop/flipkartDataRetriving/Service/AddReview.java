@@ -1,9 +1,13 @@
 package com.anoop.flipkartDataRetriving.Service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.anoop.flipkartDataRetriving.ExtractData.RetriveImageLink;
 import com.anoop.flipkartDataRetriving.ExtractData.RetriveReview;
+import com.anoop.flipkartDataRetriving.Model.ReviewData;
+import com.anoop.flipkartDataRetriving.Repository.RetriveReviewRepo;
 
 @Service
 public class AddReview {
@@ -12,12 +16,14 @@ public class AddReview {
     private RetriveReview retriveReview;
     private RetriveImageLink retriveImageLink;
     private String url;
+    private RetriveReviewRepo retriveReviewRepo;
         
-    public AddReview(LinkEdit linkEdit, GetDataFlipkart getDataFlipkart, RetriveReview retriveReview, RetriveImageLink retriveImageLink){
+    public AddReview(LinkEdit linkEdit, GetDataFlipkart getDataFlipkart, RetriveReview retriveReview, RetriveImageLink retriveImageLink, RetriveReviewRepo retriveReviewRepo){
         this.linkEdit = linkEdit;
         this.getDataFlipkart = getDataFlipkart;
         this.retriveReview = retriveReview;
         this.retriveImageLink = retriveImageLink;
+        this.retriveReviewRepo = retriveReviewRepo;
 
 
     }
@@ -32,11 +38,14 @@ public class AddReview {
     public void getReviewDataFromFlipkart(String uri){
         String reviewData = getDataFlipkart.getDAtaFromApi(uri).block();
         retriveReview.createFileAndWriteReviewPageData(reviewData);
-        String firstWord = "[{\"slotType\":\"LOGICAL\",\"id\":10003,\"parentId\":10002,\"layoutParams\":";
+        String firstWord = "[{\"slotType\":\"LOGICAL\",\"id\":10003,\"parentId\":10002,\"layoutParams\":"; //[{"slotType":"LOGICAL","id":10003,"parentId":10002,"layoutParams":
         String endWord = "\"10003\":[{\"slotType\":\"WIDGET\"";
+        String endWord2 = "\"10003\":[{\"slotType\":\"LOGICAL\"";
         String filepath = "reviewpage.txt";
-        retriveReview.findReviewData(firstWord, endWord, filepath);
-        retriveImageLink.deleteFile(filepath);
+       List<ReviewData> reviewDatas = retriveReview.findReviewData(firstWord, endWord, endWord2, filepath);
+       retriveReviewRepo.saveAll(reviewDatas);
+      // System.out.println(reviewDatas);
+       retriveImageLink.deleteFile(filepath);
        
     }
 

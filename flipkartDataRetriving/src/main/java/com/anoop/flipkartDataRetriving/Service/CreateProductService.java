@@ -1,40 +1,33 @@
 package com.anoop.flipkartDataRetriving.Service;
 
-
 import java.io.IOException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.anoop.flipkartDataRetriving.ExtractData.RetriveImageLink;
 import com.anoop.flipkartDataRetriving.Model.CreateProduct;
+import com.anoop.flipkartDataRetriving.Model.ProductColorAvailableWithImg;
 import com.anoop.flipkartDataRetriving.Model.ProductDetails;
+import com.anoop.flipkartDataRetriving.Repository.ProductColorAvailableWithImgRepo;
 import com.anoop.flipkartDataRetriving.Repository.ProductDetailRepo;
-
-
-
 
 @Service
 public class CreateProductService {
 
-   
-   
-
     private GetDataFlipkart getDataFlipkart;
     private RetriveImageLink retriveImageLink;
     private ProductDetailRepo productDetailRepo;
+    private ProductColorAvailableWithImgRepo productColorAvailableWithImgRepo;
 
-   
-    public CreateProductService(GetDataFlipkart getDataFlipkart, RetriveImageLink retriveImageLink, ProductDetailRepo productDetailRepo) {
+    public CreateProductService(GetDataFlipkart getDataFlipkart, RetriveImageLink retriveImageLink,
+            ProductDetailRepo productDetailRepo, ProductColorAvailableWithImgRepo productColorAvailableWithImgRepo) {
         this.getDataFlipkart = getDataFlipkart;
         this.retriveImageLink = retriveImageLink;
         this.productDetailRepo = productDetailRepo;
-      
-        
-    
+        this.productColorAvailableWithImgRepo = productColorAvailableWithImgRepo;
 
     }
 
-  
     public Boolean createProductUrl(CreateProduct createProduct) throws IOException {
         String url = createProduct.getProductURL();
         int originalUrlIndx = url.indexOf("FLIPKART");
@@ -50,30 +43,28 @@ public class CreateProductService {
             String endWord = ",\"offerButton\":null,\"productDetailsAnnouncement";
             String findKeyValue = "url";
 
-            String firstWord = "</span><span class=\"VU-ZEz\">";
+            String firstWord = "<span class=\"VU-ZEz\">";  
             String lastWord = "</span></h1>";
-           
-           
+
             List<String> productImgUrl = retriveImageLink.findImageLink(startWord, endWord, filePath, findKeyValue);
-           String title = retriveImageLink.findProductTitle(firstWord, lastWord, filePath);
-           String price = retriveImageLink.findProductPrice("<div class=\"Nx9bqj CxhGGd\">", "</div>", filePath);
-           retriveImageLink.findProudctColorWithImage("{\"type\":\"ProductSwatchValue\",\"attributeOptions\":[", "],\"attributes\":[{\"attributeImage\":", filePath);
-            
-           
+            String title = retriveImageLink.findProductTitle(firstWord, lastWord, filePath);
+            String price = retriveImageLink.findProductPrice("<div class=\"Nx9bqj CxhGGd\">", "</div>", filePath);
+            List<ProductColorAvailableWithImg> productColorAvailableWithImgs = retriveImageLink
+                    .findProudctColorWithImage("{\"type\":\"ProductSwatchValue\",\"attributeOptions\":[",
+                            "],\"attributes\":[{\"attributeImage\":", filePath);
+
+            productColorAvailableWithImgRepo.saveAll(productColorAvailableWithImgs);
+
             ProductDetails productDetails = new ProductDetails();
             productDetails.setProductImageURL(productImgUrl);
             productDetails.setTitle(title);
             productDetails.setPrice(price);
             productDetailRepo.save(productDetails); // save product details like image link, price, title
-            
 
-          retriveImageLink.deleteFile(filePath);
-
+           retriveImageLink.deleteFile(filePath);
 
         }
         return true;
     }
-
-    
 
 }

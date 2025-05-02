@@ -1,8 +1,5 @@
 package com.anoop.flipkartDataRetriving.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,26 +9,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDetails {
+public class ProductColorAvailableWithImg {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @NotNull
-    String title;
+    String color;
     @NotNull
-    String price;
-    
-
-
-
-    List<String> productImageURL = new ArrayList<>();
-
-   
+    String productImg;
+    @Override
+    public String toString() {
+        return "ProductColorAvailableWithImg [id=" + id + ", color=" + color + ", productImg=" + productImg + "]";
+    }
 
     
 }

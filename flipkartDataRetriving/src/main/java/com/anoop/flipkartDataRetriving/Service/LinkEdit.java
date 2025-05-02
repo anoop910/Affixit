@@ -9,7 +9,7 @@ public class LinkEdit {
 
     public String reviewLinkEdit(String url){
         String link = url;
-        String reviewLink = link.replace("/p/", "/product-reviews/").concat("&page=4");
+        String reviewLink = link.replace("/p/", "/product-reviews/").concat("&page=1");
         return reviewLink;
         
     }

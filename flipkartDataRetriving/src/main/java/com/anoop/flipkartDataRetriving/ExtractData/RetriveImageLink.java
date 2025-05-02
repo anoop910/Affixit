@@ -12,11 +12,15 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.anoop.flipkartDataRetriving.Model.ProductColorAvailableWithImg;
+import com.anoop.flipkartDataRetriving.Repository.ProductColorAvailableWithImgRepo;
 
 @Service
 public class RetriveImageLink {
-
+    
     public void createFileAndWrite(String content) {
         try (FileWriter writer = new FileWriter("output.txt")) {
             writer.write(content);
@@ -114,7 +118,10 @@ public class RetriveImageLink {
     }
 
     // find the product color available with image
-    public void findProudctColorWithImage(String startWord, String endWord, String filePath) {
+    public List<ProductColorAvailableWithImg> findProudctColorWithImage(String startWord, String endWord, String filePath) {
+
+        List<ProductColorAvailableWithImg> productColorAvailableWithImgs = new ArrayList<>();
+        
         try {
             String content = new String(Files.readAllBytes(Path.of(filePath)));
             int startIdx = content.indexOf(startWord);
@@ -137,8 +144,15 @@ public class RetriveImageLink {
                             String imageUrl = jsonObject.getString("imageUrl");
                             String productColor = jsonObject.getString("value");
                             String productColorImg = imageUrl.replace("rukmini1", "rukminim2");
-                            System.out.println("Product Color is : "+ productColor + " Product color Image is : " + productColorImg);
+                           ProductColorAvailableWithImg productColorAvailableWithImg = new ProductColorAvailableWithImg();
+                           productColorAvailableWithImg.setColor(productColor);
+                           productColorAvailableWithImg.setProductImg(productColorImg);
+                           System.out.println("product color : "+productColorAvailableWithImg);
+                            productColorAvailableWithImgs.add(productColorAvailableWithImg);
+                           
                             
+                        }else{
+                            System.out.println("some wrong in product color img");
                         }
                     }
                 }
@@ -149,7 +163,7 @@ public class RetriveImageLink {
 
             e.printStackTrace();
         }
-
+        return productColorAvailableWithImgs;
     }
 
     public void findTargetWordInFile(String targetWord, String filePath) {
