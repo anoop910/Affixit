@@ -32,32 +32,28 @@ public class RetriveReview {
     public List<ReviewData> findReviewData(String startWord, String endWord, String endWord2, String filepath) {
 
         List<ReviewData> reviewDatas = new ArrayList<>();
-        
-       
-       
+
         try {
             String content = new String(Files.readAllBytes(Path.of(filepath)));
             int lastIdx;
             int startindex = content.indexOf(startWord);
             int endIndex = content.indexOf(endWord);
             int endIndex2 = content.indexOf(endWord2);
-          
+
             if (endIndex != -1) {
                 lastIdx = endIndex;
-            }else{
+            } else {
                 lastIdx = endIndex2;
             }
-            
 
             if (startindex != -1 && lastIdx != -1) {
                 String extractContent = content.substring(startindex, lastIdx);
-               //  System.out.println(extractContent);
+                // System.out.println(extractContent);
 
                 String jsonString = extractContent.trim();
 
                 JSONArray jsonArray = new JSONArray(jsonString);
-                //System.out.println(jsonArray);
-
+                // System.out.println(jsonArray);
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     ReviewData reviewData = new ReviewData();
@@ -68,7 +64,7 @@ public class RetriveReview {
                     if (obj instanceof JSONObject jsonObject) {
                         if (jsonObject.has("widget")) {
                             JSONObject widget = jsonObject.getJSONObject("widget");
-                            
+
                             if (widget.has("data")) {
                                 JSONObject data = widget.getJSONObject("data");
                                 if (data.has("renderableComponents")) {
@@ -77,57 +73,77 @@ public class RetriveReview {
                                         JSONObject indexZero = renderableComponents.getJSONObject(0);
                                         if (indexZero.has("value")) {
                                             JSONObject value = indexZero.getJSONObject("value");
-                                            if (value.has("images")) {
-                                                JSONArray images = value.getJSONArray("images");
-                                                for (int j = 0; j < images.length(); j++) {
-                                                    JSONObject image = images.getJSONObject(j);
-                                                    JSONObject imavalue = image.getJSONObject("value");
-                                                    String imgURL = imavalue.getString("imageURL");
-                                                    reviewImgLink.add(imgURL);
-                                                    //System.out.println(imgURL);
-                                                }
-                                                reviewData.setReviewImgLink(reviewImgLink);
-                                            }
-                                            if (value.has("rating")) {
-                                                int ratingValue = value.getInt("rating");
-                                                reviewData.setRating(ratingValue);
-                                                //System.out.println("rating value : "+ ratingValue);
-                                            }
-                                            if (value.has("author")) {
-                                                String author = value.getString("author");
-                                                String created = value.getString("created");
-                                                String text = value.getString("text");
-                                                reviewData.setAuthor(author);
-                                                reviewData.setCreated(created);
-                                                reviewData.setText(text);
-                                                //System.out.println(author);
-                                                //System.out.println(created);
-                                                //System.err.println(text);
-                                            }
-                                            if (value.has("helpfulCount")) {
-                                                int like = value.getInt("helpfulCount");
-                                                reviewData.setHelpfulCount(like);
-                                               // System.out.println("Like : "+ like);
-                                            }
-                                            if (value.has("totalCount")) {
-                                                int totalCountValue = value.getInt("totalCount");
-                                                reviewData.setTotalCount(totalCountValue);
-                                               // System.out.println("Toltal Count : "+ totalCountValue);
-                                            }
                                             try {
-                                            if (value.has("location")) {
-                                                JSONObject location = value.getJSONObject("location");
-                                                String city = location.getString("city");
-                                                String state = location.getString("state");
-                                                reviewData.setCity(city);
-                                                reviewData.setState(state);
-                                              //  System.out.println("city is : " + city + " and state : "+ state);
-                                               
-
-                                            }}catch (Exception e) {
+                                                if (value.has("images")) {
+                                                    JSONArray images = value.getJSONArray("images");
+                                                    for (int j = 0; j < images.length(); j++) {
+                                                        JSONObject image = images.getJSONObject(j);
+                                                        JSONObject imavalue = image.getJSONObject("value");
+                                                        String imgURL = imavalue.getString("imageURL");
+                                                        reviewImgLink.add(imgURL);
+                                                        // System.out.println(imgURL);
+                                                    }
+                                                    reviewData.setReviewImgLink(reviewImgLink);
+                                                }
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
-                                           
+                                            try {
+                                                if (value.has("rating")) {
+                                                    int ratingValue = value.getInt("rating");
+                                                    reviewData.setRating(ratingValue);
+                                                    // System.out.println("rating value : "+ ratingValue);
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                            try {
+                                                if (value.has("author")) {
+                                                    String author = value.getString("author");
+                                                    String created = value.getString("created");
+                                                    String text = value.getString("text");
+                                                    reviewData.setAuthor(author);
+                                                    reviewData.setCreated(created);
+                                                    reviewData.setText(text);
+                                                    // System.out.println(author);
+                                                    // System.out.println(created);
+                                                    // System.err.println(text);
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                            try {
+                                                if (value.has("helpfulCount")) {
+                                                    int like = value.getInt("helpfulCount");
+                                                    reviewData.setHelpfulCount(like);
+                                                    // System.out.println("Like : "+ like);
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                            try {
+                                                if (value.has("totalCount")) {
+                                                    int totalCountValue = value.getInt("totalCount");
+                                                    reviewData.setTotalCount(totalCountValue);
+                                                    // System.out.println("Toltal Count : "+ totalCountValue);
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                            try {
+                                                if (value.has("location")) {
+                                                    JSONObject location = value.getJSONObject("location");
+                                                    String city = location.getString("city");
+                                                    String state = location.getString("state");
+                                                    reviewData.setCity(city);
+                                                    reviewData.setState(state);
+                                                    // System.out.println("city is : " + city + " and state : "+ state);
+
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+
                                         }
 
                                     }
@@ -135,11 +151,11 @@ public class RetriveReview {
                                 }
                             }
                         }
-                        
+
                     }
-                    
+
                 }
-            } else{
+            } else {
                 System.out.println("some thing wrong in finding data check your sartWord and endWord");
             }
 

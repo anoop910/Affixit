@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
+import com.anoop.flipkartDataRetriving.DTO.CreateProductDTO;
 import com.anoop.flipkartDataRetriving.ExtractData.RetriveImageLink;
 import com.anoop.flipkartDataRetriving.Model.CreateProduct;
 import com.anoop.flipkartDataRetriving.Model.ProductColorAvailableWithImg;
@@ -28,7 +29,7 @@ public class CreateProductService {
 
     }
 
-    public Boolean createProductUrl(CreateProduct createProduct) throws IOException {
+    public ProductDetails createProductDetails(CreateProductDTO createProduct) throws IOException {
         String url = createProduct.getProductURL();
         int originalUrlIndx = url.indexOf("FLIPKART");
         String originalUrl = url.substring(24, originalUrlIndx + 8);
@@ -59,12 +60,12 @@ public class CreateProductService {
             productDetails.setProductImageURL(productImgUrl);
             productDetails.setTitle(title);
             productDetails.setPrice(price);
-            productDetailRepo.save(productDetails); // save product details like image link, price, title
+            ProductDetails productDetails2 = productDetailRepo.save(productDetails); // save product details like image link, price, title
 
            retriveImageLink.deleteFile(filePath);
-
+           return productDetails2;
         }
-        return true;
+      return null;
     }
 
 }
